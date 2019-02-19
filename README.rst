@@ -4,6 +4,32 @@ Youtube proxy
 
 This project allows you to record and playback youtube videos for testing.
 
+How things work
+---------------
+
+When the Youtube client loads, it calls the server to get chunks of
+audio and video data with a request on::
+
+  https://someserver.googlevideo.com/videoplayback?itag=XXX&range=A:B
+
+Where **itag** is the quality of the video, defined by an integer
+see the full list at https://github.com/tarekziade/youtube-test/blob/master/yttest/util.py#L9
+and **range** is the bytes requested for the video.
+
+The Youtube client can change the quality on the fly during playback,
+and request arbitrary chunks, so a regular proxy will record one single
+flavor of playback for the video. The sequence of chunks asked from the server
+may vary depending on the network and user activity.
+
+In order to provide a reliable proxy for reproducible local playback, and treat
+the YT client as a black box, the audio and video files are rebuilt locally so
+any chunk can be returned when requested. For a given YT video, if the video is
+fully played on all qualities, the proxy will have all the chunks.
+
+It's required to update the recorded chunks on a regular basis to avoid
+a regression in case the youtube client or server change.
+
+
 Installation
 ------------
 
