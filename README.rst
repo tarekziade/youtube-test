@@ -18,13 +18,14 @@ and **range** is the bytes requested for the video.
 
 The Youtube client can change the quality on the fly during playback,
 and request arbitrary chunks, so a regular proxy will record one single
-flavor of playback for the video. The sequence of chunks asked from the server
-may vary depending on the network and user activity.
+combination of playback for the video. The sequence of chunks asked from the
+server may vary depending on the network and user activity, and a recorded
+playback may fail on a following run.
 
-In order to provide a reliable proxy for reproducible local playback, and treat
-the YT client as a black box, the audio and video files are rebuilt locally so
-any chunk can be returned when requested. For a given YT video, if the video is
-fully played on all qualities, the proxy will have all the chunks.
+In order to provide a reliable proxy for reproducible local playbacks, and
+treat the YT client as a black box, the audio and video files are rebuilt
+locally so any chunk can be returned when requested. For a given YT video, if
+the video is fully played on all qualities, the proxy will have all the chunks.
 
 It's required to update the recorded chunks on a regular basis to avoid
 a regression in case the youtube client or server change.
