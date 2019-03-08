@@ -518,7 +518,10 @@ def log(msg):
 
 
 _HERE = os.path.dirname(__file__)
-_DEFAULT_DATA_DIR = os.path.join(_HERE, "..", "data")
+if "MOZPROXY_DIR" in os.environ:
+    _DEFAULT_DATA_DIR = os.environ["MOZPROXY_DIR"]
+else:
+    _DEFAULT_DATA_DIR = os.path.join(_HERE, "..", "data")
 
 _HEADERS = {
     b"Last-Modified": b"Mon, 10 Dec 2018 19:39:24 GMT",

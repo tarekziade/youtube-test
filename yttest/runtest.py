@@ -15,6 +15,7 @@ from mozprofile import FirefoxProfile
 mozlog.commandline.setup_logging('mozproxy', {}, {'tbpl': sys.stdout})
 
 
+here = os.path.dirname(__file__)
 config = {}
 config['app'] = 'firefox'
 config['binary'] = ('/Users/tarek/Dev/gecko/mozilla-central-opt/'
@@ -25,11 +26,11 @@ config['run_local'] = True
 config['obj_path'] = '/tmp'
 config['host'] = 'localhost'
 config['playback_tool'] = 'mitmproxy'
+config['custom_script'] = os.path.join(here, 'playback.py')
 
-
-config['playback_recordings'] = 'youtube.mp'
-config['playback_pageset_manifest'] = 'mitmproxy-recordings-raptor-tp6.manifest'
-
+config['playback_recordings'] = 'wvpZZqmnNhg.playback'
+#config['playback_pageset_manifest'] = 'mitmproxy-recordings-raptor-tp6.manifest'
+config['playback_artifacts'] = 'https://ziade.org/wvpZZqmnNhg.tar.gz'
 
 # XXX we should not have to set this
 config['playback_binary_manifest'] = 'mitmproxy-rel-bin-osx.manifest'
@@ -39,6 +40,8 @@ config['playback_binary_manifest'] = 'mitmproxy-rel-bin-osx.manifest'
 def open_youtube_video(video_id):
     url = "https://www.youtube.com/watch?v=%s" % video_id
     proxy = get_playback(config)
+    if proxy is None:
+        raise Exception("Could not start Proxy")
     try:
         env = os.environ.copy()
         prefs = {"media.autoplay.default": 0}
