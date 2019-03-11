@@ -8,9 +8,12 @@ from mozproxy import get_playback
 import mozinfo
 import mozlog
 import sys
+
 from mozrunner import FirefoxRunner
 from mozprofile import FirefoxProfile
-from .mario import execute_script
+from yttest.mario import execute_script
+from marionette_driver.geckoinstance import apps
+
 
 mozlog.commandline.setup_logging('mozproxy', {}, {'tbpl': sys.stdout})
 
@@ -43,7 +46,6 @@ def open_youtube_video(video_id):
     if proxy is None:
         raise Exception("Could not start Proxy")
     try:
-        env = os.environ.copy()
         prefs = {"media.autoplay.default": 0}
         prefs["network.proxy.type"] = 1
         prefs["network.proxy.http"] = config['host']
@@ -54,10 +56,10 @@ def open_youtube_video(video_id):
         profile = FirefoxProfile(profile='/tmp/mozprof',
                                 preferences=prefs,
                                 addons=[])
-        browser = FirefoxRunner(profile=profile,
-                                binary=config['binary'],
-                                cmdargs=[url],
-                                env=env)
+        browser = apps['fxdesktop'].create(profile=profile,
+                                app='fxdesktop',
+                                bin=config['binary'],
+                                app_args=[url])
 
         browser.start()
     except Exception:
@@ -67,15 +69,17 @@ def open_youtube_video(video_id):
     try:
         yield
     finally:
-        browser.wait(timeout=20)
-        proxy.stop()
+        try:
+            browser.close()
+        finally:
+            proxy.stop()
 
 
 class YoutubeTest(unittest.TestCase):
 
     def test_stream(self):
         with open_youtube_video("wvpZZqmnNhg"):
-            execute_script("alert('test running')")
+            execute_script("console.log('test running')")
             assert True
 
 

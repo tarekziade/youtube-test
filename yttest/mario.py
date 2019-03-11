@@ -6,6 +6,7 @@ from marionette_driver.by import By
 
 
 def execute_script(script, context="chrome"):
+    import pdb; pdb.set_trace()
     client = Marionette(host='localhost', port=2828)
     client.start_session()
 
