@@ -1,5 +1,6 @@
 # XXXX work in progress...
 #
+import time
 import os
 import unittest
 from contextlib import contextmanager
@@ -11,7 +12,7 @@ import sys
 
 from mozrunner import FirefoxRunner
 from mozprofile import FirefoxProfile
-from yttest.mario import execute_script
+from yttest.mario import YoutubePage
 from marionette_driver.geckoinstance import apps
 
 
@@ -40,8 +41,7 @@ config['playback_binary_manifest'] = 'mitmproxy-rel-bin-osx.manifest'
 
 
 @contextmanager
-def open_youtube_video(video_id):
-    url = "https://www.youtube.com/watch?v=%s" % video_id
+def youtube_video(video_id):
     proxy = get_playback(config)
     if proxy is None:
         raise Exception("Could not start Proxy")
@@ -59,28 +59,58 @@ def open_youtube_video(video_id):
         browser = apps['fxdesktop'].create(profile=profile,
                                 app='fxdesktop',
                                 bin=config['binary'],
-                                app_args=[url])
-
+                                app_args=[])
         browser.start()
     except Exception:
         proxy.stop()
         raise
 
     try:
-        yield
+        page = YoutubePage(video_id)
+    except Exception:
+        try:
+            browser.close()
+        finally:
+            proxy.stop()
+        raise
+
+    try:
+        yield page
     finally:
         try:
+            page.close()
             browser.close()
         finally:
             proxy.stop()
 
 
+S = """\
+var video = document.getElementsByTagName("video")[0];
+if (!video) {
+  return "Can't find the video tag";
+}
+
+var vpq = video.getVideoPlaybackQuality();
+
+# XXX add an event to check that the end of the video has been reached.
+# XXX this event can also happen on the fake YT server side
+# since the client sends a telemetry ping when this happens
+return vpq;
+"""
+
+
 class YoutubeTest(unittest.TestCase):
 
     def test_stream(self):
-        with open_youtube_video("wvpZZqmnNhg"):
-            execute_script("console.log('test running')")
-            assert True
+        with youtube_video("wvpZZqmnNhg") as page:
+            time.sleep(10)   # needs to wait, find out why XXX
+            page.start_video()
+            time.sleep(25)
+            res = page.execute_script(S)
+            # checking the video playback quality
+            self.assertEqual(res['droppedVideoFrames'], 0)
+            # XXX do the maths to see how much frames we were supposed to play
+            self.assertEqual(res['totalVideoFrames'] > 700)
 
 
 if __name__ == '__main__':
