@@ -10,7 +10,7 @@ import mozlog
 import sys
 from mozrunner import FirefoxRunner
 from mozprofile import FirefoxProfile
-
+from .mario import execute_script
 
 mozlog.commandline.setup_logging('mozproxy', {}, {'tbpl': sys.stdout})
 
@@ -75,7 +75,7 @@ class YoutubeTest(unittest.TestCase):
 
     def test_stream(self):
         with open_youtube_video("wvpZZqmnNhg"):
-            # inject and run the test using marionette here
+            execute_script("alert('test running')")
             assert True
 
 
