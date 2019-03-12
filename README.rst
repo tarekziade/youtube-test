@@ -61,7 +61,7 @@ Go to youtube and select a short video, for example: https://www.youtube.com/wat
 
 To start the proxy in record mode, run ::
 
-   $ ./mitmdump -w yttest/record.py wvpZZqmnNhg
+   $ ./mitmdump -w data/wvpZZqmnNhg.playback -s yttest/record.py
 
 Where wvpZZqmnNhg is the id of the video.
 
@@ -75,7 +75,7 @@ Playback
 
 To start the proxy in playback mode, run ::
 
-   $ ./mitmdump -S data/wvpZZqmnNhg.playback -s yttest/playback.py -k --server-replay-nopop
+   $ ./mitmdump --set upstream_cert=false -v --server-replay-nopop -S data/wvpZZqmnNhg.playback -s yttest/playback.py
 
 Then visit the browser at https://www.youtube.com/watch?v=wvpZZqmnNhg
 

@@ -627,6 +627,8 @@ def request(flow):
         OK(flow)
         return
     if "googlevideo.com/videoplayback" in flow.request.url:
+
+        from mitmproxy import http
         query_args = dict(flow.request.query)
         file_id = query_args["id"]
         full_build(file_id)
