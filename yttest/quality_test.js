@@ -1,12 +1,21 @@
-
+// this script is injected by marionette to collect metrics
 var video = document.getElementsByTagName("video")[0];
 if (!video) {
   return "Can't find the video tag";
 }
 
-var vpq = video.getVideoPlaybackQuality();
+async function test() {
+  let promise = new Promise((resolve, reject) => {
+    function videoEnded() {
+      resolve(video.getVideoPlaybackQuality());
+    }
+    video.addEventListener("ended", videoEnded, true);
+    // XXX not allowed, so we use autoplay
+    // await video.play();
+  });
+  var vqp = await promise;
+  return vqp;
+}
 
-// XXX add an event to check that the end of the video has been reached.
-// XXX this event can also happen on the fake YT server side
-// since the client sends a telemetry ping when this happens
-return vpq;
+return test();
+

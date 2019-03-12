@@ -23,6 +23,7 @@ class YoutubePage:
         self.started = True
 
     def run_test(self):
+        self.start_video()
         return self.execute_script(js_test)
 
     def execute_script(self, script, context=None):

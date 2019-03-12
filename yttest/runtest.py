@@ -12,9 +12,6 @@ mozlog.commandline.setup_logging("mozproxy", {}, {"tbpl": sys.stdout})
 class YoutubeTest(unittest.TestCase):
     def test_stream(self):
         with youtube_video("wvpZZqmnNhg") as page:
-            time.sleep(10)  # needs to wait, find out why XXX
-            page.start_video()
-            time.sleep(25)
             res = page.run_test()
             # checking the video playback quality
             self.assertEqual(res["droppedVideoFrames"], 0)
