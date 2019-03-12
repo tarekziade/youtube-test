@@ -14,9 +14,8 @@ class YoutubeTest(unittest.TestCase):
         with youtube_video("wvpZZqmnNhg") as page:
             res = page.run_test()
             # checking the video playback quality
-            self.assertEqual(res["droppedVideoFrames"], 0)
-            # XXX do the maths to see how much frames we were supposed to play
-            self.assertTrue(res["totalVideoFrames"] > 700)
+            self.assertTrue(res["droppedVideoFrames"] < 744. * 0.1)
+            self.assertTrue(res["totalVideoFrames"], 744)
 
 
 if __name__ == "__main__":
