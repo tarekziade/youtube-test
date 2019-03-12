@@ -25,6 +25,8 @@ config["host"] = "localhost"
 config["playback_tool"] = "mitmproxy"
 config["custom_script"] = os.path.join(here, "playback.py")
 
+# XXX we should use a generic name since the taball now
+# contains several videos
 config["playback_artifacts"] = "https://ziade.org/wvpZZqmnNhg.tar.gz"
 
 # XXX we should not have to set this
@@ -35,8 +37,7 @@ config["playback_binary_manifest"] = "mitmproxy-rel-bin-osx.manifest"
 def youtube_video(video_id):
     config["playback_recordings"] = "%s.playback" % video_id
     config["proxy_args"] = [
-    #"--server-replay-kill-extra",
-    "--set upstream_cert=false",
+    "--set", "upstream_cert=false",
     "-S", "/tmp/testing/mozproxy/%s.playback" % video_id,
     ]
     proxy = get_playback(config)
