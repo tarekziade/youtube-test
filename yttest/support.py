@@ -44,6 +44,8 @@ def youtube_video(video_id):
         raise Exception("Could not start Proxy")
     try:
         prefs = {"media.autoplay.default": 0}
+        prefs["browser.newtabpage.activity-stream.feeds.snippets"] = 0
+        prefs["browser.newtabpage.activity-stream.disableSnippets"] = 1
         prefs["network.proxy.type"] = 1
         prefs["network.proxy.http"] = config["host"]
         prefs["network.proxy.http_port"] = 8080
@@ -52,7 +54,8 @@ def youtube_video(video_id):
         prefs["network.proxy.no_proxies_on"] = config["host"]
         profile = FirefoxProfile(profile="/tmp/mozprof", preferences=prefs, addons=[])
         browser = apps["fxdesktop"].create(
-            profile=profile, app="fxdesktop", bin=config["binary"], app_args=[]
+            profile=profile, app="fxdesktop", bin=config["binary"],
+            app_args=["about:blank"]
         )
         browser.start()
     except Exception:
