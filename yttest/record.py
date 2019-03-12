@@ -7,7 +7,6 @@ except modules from the standard library and mitmproxy modules.
 import os
 import re
 import sys
-from mitmproxy.tools.main import mitmdump
 
 
 _HERE = os.path.dirname(__file__)
@@ -34,6 +33,7 @@ def response(flow):
 
 
 if __name__ == "__main__":
+    from mitmproxy.tools.main import mitmdump
     script = _HERE + "/record.py"
     sys.argv[0] = re.sub(r"(-script\.pyw?|\.exe)?$", "", sys.argv[0])
     sys.argv[1:] = ["-w", "data/%s.playback" % sys.argv[1], "-s", script]

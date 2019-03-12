@@ -11,7 +11,6 @@ import datetime
 import time
 import re
 
-from mitmproxy import http
 
 itags = {
     5: {
@@ -609,6 +608,7 @@ def get_cached_data(request, datadir=_DEFAULT_DATA_DIR):
 
 
 def OK(flow, code=204):
+    from mitmproxy import http
     flow.error = None
     flow.response = http.HTTPResponse(b"HTTP/1.1", code, b"OK", {}, b"")
 

@@ -37,7 +37,6 @@ Installation
 ::
 
  $ virtualenv .
- $ bin/pip install -r requirements.txt
  $ bin/python setup.py develop
 
 Add a .mitmproxy/config.yaml file in your home dir::
@@ -49,7 +48,11 @@ Add a .mitmproxy/config.yaml file in your home dir::
   stream_large_bodies: 5m
   server_replay_nopop: True
 
-Install the mitm certificate by visiting mitm.it
+Make sure you install mitmproxy 2.x or 4.x - if you are
+using Python 2, you need to use the binary version of mitmproxy
+because the Python 2 version is outdated.
+
+
 
 Record
 ------
@@ -58,7 +61,7 @@ Go to youtube and select a short video, for example: https://www.youtube.com/wat
 
 To start the proxy in record mode, run ::
 
-   $ bin/python yttest/record.py wvpZZqmnNhg
+   $ ./mitmdump -w yttest/record.py wvpZZqmnNhg
 
 Where wvpZZqmnNhg is the id of the video.
 
@@ -70,12 +73,26 @@ Stop the proxy. The data/ directory will contain all audio and video files.
 Playback
 --------
 
-
 To start the proxy in playback mode, run ::
 
-   $ bin/python yttest/playback.py wvpZZqmnNhg
+   $ ./mitmdump -S data/wvpZZqmnNhg.playback -s yttest/playback.py -k --server-replay-nopop
 
 Then visit the browser at https://www.youtube.com/watch?v=wvpZZqmnNhg
 
 
+Unit test integration
+---------------------
+
+Example::
+
+
+   import unittest
+   from yttest.support import youtube_video
+
+   class YoutubeTest(unittest.TestCase):
+      def test_stream(self):
+         with youtube_video("wvpZZqmnNhg") as page:
+               res = page.run_test()
+               # checking the video playback quality
+               self.assertEqual(res["droppedVideoFrames"], 0)
 
