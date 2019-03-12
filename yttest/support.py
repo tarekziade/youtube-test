@@ -36,7 +36,7 @@ config["playback_binary_manifest"] = "mitmproxy-rel-bin-osx.manifest"
 @contextmanager
 def youtube_video(video_id):
     config["playback_recordings"] = "%s.playback" % video_id
-    config["proxy_args"] = [
+    config["playback_tool_args"] = [
     "--set", "upstream_cert=false",
     "-S", "/tmp/testing/mozproxy/%s.playback" % video_id,
     ]
