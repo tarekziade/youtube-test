@@ -6,10 +6,8 @@ except modules from the standard library and mitmproxy modules.
 """
 import os
 import sys
-from collections import defaultdict
 import datetime
 import time
-import re
 
 
 itags = {
@@ -554,35 +552,6 @@ _HEADERS = {
 }
 
 
-def full_build(file_id, datadir=_DEFAULT_DATA_DIR):
-    chunks = defaultdict(list)
-    for f in os.listdir(datadir):
-        if not f.startswith(file_id):
-            continue
-        extension = f.split(".")[-1]
-        full_name = "full-%s.%s" % (file_id, extension)
-        full_name = os.path.join(datadir, full_name)
-        if os.path.exists(full_name):
-            continue
-        frange = f.split(".")[0].split("-")[-3:]
-        itag, start, end = frange[0], int(frange[1]), int(frange[2])
-        f = os.path.join(datadir, f)
-        with open(f, "rb") as content:
-            chunks[itag, extension].append((start, end, content.read()))
-
-    for (itag, extension), chunk in chunks.items():
-        full_name = "full-%s-%s.%s" % (file_id, itag, extension)
-        full_name = os.path.join(datadir, full_name)
-        if os.path.exists(full_name):
-            continue
-        chunk.sort()
-        buffer = b""
-        for start, end, data in chunk:
-            buffer += data
-        with open(full_name, "wb") as f:
-            f.write(buffer)
-
-
 def get_cached_data(request, datadir=_DEFAULT_DATA_DIR):
     query_args = dict(request.query)
     mime = query_args["mime"]
@@ -594,7 +563,8 @@ def get_cached_data(request, datadir=_DEFAULT_DATA_DIR):
     log("Requested quality\n%s" % print_itag(itag))
     frange = file_range.split("-")
     range_start, range_end = int(frange[0]), int(frange[1])
-    fn = "full-%s-%s.%s" % (file_id, itag, mime.replace("/", "-"))
+    video_id = sys.argv[-1].split(".")[0]
+    fn = "%s-%s-%s.%s" % (video_id, itag, mime.replace("/", ""), mime.split("/")[-1])
     fn = os.path.join(datadir, fn)
     if not os.path.exists(fn):
         raise Exception("no file at %s" % fn)
@@ -609,6 +579,7 @@ def get_cached_data(request, datadir=_DEFAULT_DATA_DIR):
 
 def OK(flow, code=204):
     from mitmproxy import http
+
     flow.error = None
     flow.response = http.HTTPResponse(b"HTTP/1.1", code, b"OK", {}, b"")
 
@@ -627,11 +598,10 @@ def request(flow):
         OK(flow)
         return
     if "googlevideo.com/videoplayback" in flow.request.url:
-
         from mitmproxy import http
+
         query_args = dict(flow.request.query)
         file_id = query_args["id"]
-        full_build(file_id)
         file_range = query_args["range"]
         headers, data = get_cached_data(flow.request)
         headers = list(headers)
@@ -642,19 +612,3 @@ def request(flow):
         flow.response.timestamp_start = time.mktime(then.timetuple())
         flow.response.refresh()
         log("SENT FILE %s IN CACHE - range %s" % (file_id, file_range))
-
-
-if __name__ == "__main__":
-    from mitmproxy.tools.main import mitmdump
-
-    script = _HERE + "/playback.py"
-    sys.argv[0] = re.sub(r"(-script\.pyw?|\.exe)?$", "", sys.argv[0])
-    sys.argv[1:] = [
-        "-S",
-        "data/%s.playback" % sys.argv[1],
-        "-s",
-        script,
-        "-k",
-        "--server-replay-nopop",
-    ]
-    sys.exit(mitmdump())

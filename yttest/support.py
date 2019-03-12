@@ -25,7 +25,6 @@ config["host"] = "localhost"
 config["playback_tool"] = "mitmproxy"
 config["custom_script"] = os.path.join(here, "playback.py")
 
-config["playback_recordings"] = "wvpZZqmnNhg.playback"
 config["playback_artifacts"] = "https://ziade.org/wvpZZqmnNhg.tar.gz"
 
 # XXX we should not have to set this
@@ -34,6 +33,12 @@ config["playback_binary_manifest"] = "mitmproxy-rel-bin-osx.manifest"
 
 @contextmanager
 def youtube_video(video_id):
+    config["playback_recordings"] = "%s.playback" % video_id
+    config["proxy_args"] = [
+    #"--server-replay-kill-extra",
+    "--set upstream_cert=false",
+    "-S", "/tmp/testing/mozproxy/%s.playback" % video_id,
+    ]
     proxy = get_playback(config)
     if proxy is None:
         raise Exception("Could not start Proxy")

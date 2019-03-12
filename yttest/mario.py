@@ -30,7 +30,7 @@ class YoutubePage:
         if context is None:
             context = self.client.CONTEXT_CONTENT
         with self.client.using_context(context):
-            return self.client.execute_script(script)
+            return self.client.execute_script(script, script_timeout=600*1000)
 
     def close(self):
         if self.started:

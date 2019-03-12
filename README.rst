@@ -38,6 +38,7 @@ Installation
 
  $ virtualenv .
  $ bin/python setup.py develop
+ $ bin/pip install pytube
 
 Add a .mitmproxy/config.yaml file in your home dir::
 
@@ -66,16 +67,20 @@ To start the proxy in record mode, run ::
 Where wvpZZqmnNhg is the id of the video.
 
 Set firefox to use 127.0.0.1:8080 as a proxy server.
-Play the video in all quality to fill the proxy cache.
+Play the video fully once.
+Stop the proxy. The data/ directory will contain the playback file.
 
-Stop the proxy. The data/ directory will contain all audio and video files.
+Now let's download all streams::
+
+   $ bin/python yttest/download.py wvpZZqmnNhg
+
 
 Playback
 --------
 
 To start the proxy in playback mode, run ::
 
-   $ ./mitmdump --set upstream_cert=false -v --server-replay-nopop -S data/wvpZZqmnNhg.playback -s yttest/playback.py
+   $ ./mitmdump --set upstream_cert=false -v --server-replay-nopop -S data/wvpZZqmnNhg.playback -s yttest/playback.py wvpZZqmnNhg
 
 Then visit the browser at https://www.youtube.com/watch?v=wvpZZqmnNhg
 
