@@ -53,7 +53,8 @@ Make sure you install mitmproxy 2.x or 4.x - if you are
 using Python 2, you need to use the binary version of mitmproxy
 because the Python 2 version is outdated.
 
-
+You also need to make sure you have all the mozbase packages in your
+environment against the latest mozilla-central.
 
 Record
 ------
